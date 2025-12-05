@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Budget Tracker Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <i class="fas fa-wallet"></i>
+                <h1>BudgetTracker</h1>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="icon-btn" id="themeBtn">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Panels -->
+        <main class="main-content">
+            <!-- Dashboard Panel -->
+            <section class="panel dashboard-panel active" id="dashboardPanel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                    <div class="current-month">December 2025</div>
+                </div>
+                
+                <div class="budget-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Monthly Budget</h3>
+                            <div class="amount">₱<span id="monthlyBudget">1500</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon spent">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Spent This Month</h3>
+                            <div class="amount">₱<span id="totalSpent">0</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon remaining">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Remaining</h3>
+                            <div class="amount">₱<span id="remainingBudget">1500</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon savings">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>LRT Discount Savings</h3>
+                            <div class="amount">₱<span id="discountSavings">0</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="expense-breakdown">
+                    <h3><i class="fas fa-chart-pie"></i> Expense Breakdown</h3>
+                    <div class="breakdown-chart">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                    <div class="category-list" id="categoryList">
+                        <!-- Categories will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expenses Panel -->
+            <section class="panel expenses-panel" id="expensesPanel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-receipt"></i> Expense Tracker</h2>
+                    <button class="btn-add" id="addExpenseBtn">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                </div>
+                
+                <div class="expense-filters">
+                    <div class="filter-group">
+                        <label for="expenseCategory">Category:</label>
+                        <select id="expenseCategory">
+                            <option value="all">All Categories</option>
+                            <option value="transport">Transportation</option>
+                            <option value="food">Food</option>
+                            <option value="coffee">Coffee</option>
+                            <option value="groceries">Groceries</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="expenseDate">Date:</label>
+                        <input type="date" id="expenseDate" value="2025-12-05" min="2025-12-01" max="2025-12-31">
+                    </div>
+                </div>
+                
+                <div class="expense-list" id="expenseList">
+                    <!-- Expenses will be populated here -->
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>No expenses recorded yet</p>
+                        <button class="btn-primary" id="addFirstExpenseBtn">Add Your First Expense</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transportation Panel -->
+            <section class="panel transport-panel" id="transportPanel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-train"></i> LRT 1 Tracker</h2>
+                    <button class="btn-add" id="addTransportBtn">
+                        <i class="fas fa-plus"></i> Add Trip
+                    </button>
+                </div>
+                
+                <div class="transport-info">
+                    <div class="info-card">
+                        <h3><i class="fas fa-ticket-alt"></i> LRT 1 Fare (with 50% discount)</h3>
+                        <div class="fare-table">
+                                <div class="fare-row">
+                                    <span>Baclaran to Roosevelt (19 stations)</span>
+                                    <span>₱<span id="fullFare1">44.18</span> <small class="original-fare">(was ₱<span id="discountedFare1">22.09</span>)</small></span>
+                                </div>
+                                <div class="fare-row">
+                                     <span>Average trip (5 stations)</span>
+                                    <span>₱<span id="fullFare2">23.60</span> <small class="original-fare">(was ₱<span id="discountedFare2">11.80</span>)</small></span>
+                                </div>
+                            <div class="fare-row">
+                                <span>Short trip (3 stations)</span>
+                                <span>₱<span id="fullFare3">20.66</span> <small class="original-fare">(was ₱<span id="discountedFare3">10.33</span>)</small></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="trip-calculator" id="tripCalculator">
+                        <h3><i class="fas fa-calculator"></i> Trip Calculator</h3>
+                        <div class="calculator-form">
+                            <div class="form-group">
+                                <label for="stationFrom">From Station:</label>
+                                <select id="stationFrom">
+                                    <option value="Baclaran">Baclaran</option>
+                                    <option value="EDSA">EDSA</option>
+                                    <option value="Libertad">Libertad</option>
+                                    <option value="Gil Puyat">Gil Puyat</option>
+                                    <option value="Vito Cruz">Vito Cruz</option>
+                                    <option value="Quirino">Quirino</option>
+                                    <option value="Pedro Gil">Pedro Gil</option>
+                                    <option value="United Nations">United Nations</option>
+                                    <option value="Central Terminal">Central Terminal</option>
+                                    <option value="Carriedo">Carriedo</option>
+                                    <option value="Doroteo Jose">Doroteo Jose</option>
+                                    <option value="Bambang">Bambang</option>
+                                    <option value="Tayuman">Tayuman</option>
+                                    <option value="Blumentritt">Blumentritt</option>
+                                    <option value="Abad Santos">Abad Santos</option>
+                                    <option value="R. Papa">R. Papa</option>
+                                    <option value="5th Avenue">5th Avenue</option>
+                                    <option value="Monumento">Monumento</option>
+                                    <option value="Balintawak">Balintawak</option>
+                                    <option value="Roosevelt">Roosevelt</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="stationTo">To Station:</label>
+                                <select id="stationTo">
+                                    <option value="Roosevelt">Roosevelt</option>
+                                    <option value="Balintawak">Balintawak</option>
+                                    <option value="Monumento">Monumento</option>
+                                    <option value="5th Avenue">5th Avenue</option>
+                                    <option value="R. Papa">R. Papa</option>
+                                    <option value="Abad Santos">Abad Santos</option>
+                                    <option value="Blumentritt">Blumentritt</option>
+                                    <option value="Tayuman">Tayuman</option>
+                                    <option value="Bambang">Bambang</option>
+                                    <option value="Doroteo Jose">Doroteo Jose</option>
+                                    <option value="Carriedo">Carriedo</option>
+                                    <option value="Central Terminal">Central Terminal</option>
+                                    <option value="United Nations">United Nations</option>
+                                    <option value="Pedro Gil">Pedro Gil</option>
+                                    <option value="Quirino">Quirino</option>
+                                    <option value="Vito Cruz">Vito Cruz</option>
+                                    <option value="Gil Puyat">Gil Puyat</option>
+                                    <option value="Libertad">Libertad</option>
+                                    <option value="EDSA">EDSA</option>
+                                    <option value="Baclaran">Baclaran</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tripCount">Number of trips (round trip = 2):</label>
+                                <input type="number" id="tripCount" min="1" value="2">
+                            </div>
+                            <div class="calculator-result">
+                                <h4>Trip Cost: <span id="tripCost">₱0</span></h4>
+                                <p class="savings-info">You save: <span id="tripSavings">₱0</span> with 50% discount</p>
+                            </div>
+                            <button class="btn-primary" id="saveTripBtn">Save Trip to Log</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="transport-log">
+                    <h3><i class="fas fa-history"></i> Recent Trips</h3>
+                    <div class="log-list" id="transportLog">
+                        <!-- Transport logs will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Log Panel -->
+            <section class="panel time-panel" id="timePanel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-clock"></i> Time Log</h2>
+                    <div class="time-buttons">
+                        <button class="btn-time" id="timeInBtn">
+                            <i class="fas fa-sign-in-alt"></i> Time In
+                        </button>
+                        <button class="btn-time" id="timeOutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Time Out
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="current-time-card">
+                    <div class="current-time">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <div class="time-display" id="currentTime">--:--:--</div>
+                            <div class="date-display" id="currentDate">Friday, December 5, 2025</div>
+                        </div>
+                    </div>
+                    <div class="today-summary">
+                        <div class="today-item">
+                            <span>Time In:</span>
+                            <strong id="todayTimeIn">--:--</strong>
+                        </div>
+                        <div class="today-item">
+                            <span>Time Out:</span>
+                            <strong id="todayTimeOut">--:--</strong>
+                        </div>
+                        <div class="today-item">
+                            <span>Total Hours:</span>
+                            <strong id="todayTotalHours">0h 0m</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="time-log-container">
+                    <h3><i class="fas fa-calendar-alt"></i> Time Log History</h3>
+                    <div class="time-filters">
+                        <div class="filter-group">
+                            <label for="logDate">Select Date:</label>
+                            <input type="date" id="logDate" value="2025-12-05" min="2025-12-01" max="2025-12-31">
+                        </div>
+                        <button class="btn-secondary" id="exportLogBtn">
+                            <i class="fas fa-download"></i> Export Log
+                        </button>
+                    </div>
+                    
+                    <div class="time-log-list" id="timeLogList">
+                        <!-- Time logs will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Expense Modal -->
+            <div class="modal" id="expenseModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-plus-circle"></i> Add New Expense</h3>
+                        <button class="close-btn" id="closeExpenseModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="expenseForm">
+                            <div class="form-group">
+                                <label for="newExpenseCategory">Category:</label>
+                                <select id="newExpenseCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="transport">Transportation</option>
+                                    <option value="food">Food</option>
+                                    <option value="coffee">Coffee</option>
+                                    <option value="groceries">Groceries</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseAmount">Amount (₱):</label>
+                                <input type="number" id="expenseAmount" min="1" step="1" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDescription">Description:</label>
+                                <input type="text" id="expenseDescription" placeholder="What was this expense for?">
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDateInput">Date:</label>
+                                <input type="date" id="expenseDateInput" value="2025-12-05" min="2025-12-01" max="2025-12-31" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                                <button type="submit" class="btn-primary">Save Expense</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-panel="dashboardPanel">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-btn" data-panel="expensesPanel">
+                <i class="fas fa-receipt"></i>
+                <span>Expenses</span>
+            </button>
+            <button class="nav-btn" data-panel="transportPanel">
+                <i class="fas fa-train"></i>
+                <span>LRT Tracker</span>
+            </button>
+            <button class="nav-btn" data-panel="timePanel">
+                <i class="fas fa-clock"></i>
+                <span>Time Log</span>
+            </button>
+        </nav>
+
+        <!-- Temporary reset button - can remove later -->
+        <button onclick="resetToDecember5()" class="reset-btn">
+            Reset to Dec 5
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="modules/expenseModule.js"></script>
+    <script src="modules/transportModule.js"></script>
+    <script src="modules/timeLogModule.js"></script>
+    <script src="modules/budgetModule.js"></script>
+    <script src="modules/uiModule.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+    function resetToDecember5() {
+        if (confirm('Reset all data and start fresh for December 5, 2025?')) {
+            localStorage.clear();
+            localStorage.setItem('monthlyBudget', '1500');
+            location.reload();
+        }
+    }
+    </script>
+</body>
+</html>
