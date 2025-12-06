@@ -64,7 +64,7 @@ const ExpenseModule = (function() {
         if (expenseModal) {
             expenseModal.classList.add('active');
             // Set today's date as default
-            document.getElementById('expenseDateInput').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDateInput').value = '2025-12-05';
         }
     }
     
@@ -179,6 +179,14 @@ const ExpenseModule = (function() {
             <div class="expense-info">
                 <div class="expense-amount">₱${expense.amount.toFixed(2)}</div>
                 <div class="expense-date">${formattedDate}</div>
+                <div class="expense-actions">
+                    <button class="btn-icon" onclick="ExpenseModule.editExpense(${expense.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-danger" onclick="ExpenseModule.deleteExpense(${expense.id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `;
         
@@ -220,6 +228,236 @@ const ExpenseModule = (function() {
             const expenseDate = new Date(expense.date);
             return expenseDate.getFullYear() === year && expenseDate.getMonth() === month;
         });
+    }
+    
+    // Edit expense
+    function editExpense(expenseId) {
+        const expense = expenses.find(e => e.id === expenseId);
+        if (!expense) return;
+        
+        // Open modal with existing data
+        openExpenseModal();
+        
+        // Pre-fill form
+        setTimeout(() => {
+            document.getElementById('newExpenseCategory').value = expense.category;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('expenseDescription').value = expense.description || '';
+            document.getElementById('expenseDateInput').value = expense.date;
+            
+            // Change form submission to edit mode
+            const form = document.getElementById('expenseForm');
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                
+                expense.category = document.getElementById('newExpenseCategory').value;
+                expense.amount = parseFloat(document.getElementById('expenseAmount').value);
+                expense.description = document.getElementById('expenseDescription').value;
+                expense.date = document.getElementById('expenseDateInput').value;
+                
+                saveExpenses();
+                renderExpenses();
+                closeModal();
+                
+                showNotification('Expense updated!', 'success');
+                
+                // Reset form handler
+                form.onsubmit = handleExpenseSubmit;
+            };
+        }, 100);
+    }
+    
+    // Delete expense
+    function deleteExpense(expenseId) {
+        if (confirm('Are you sure you want to delete this expense?')) {
+            expenses = expenses.filter(e => e.id !== expenseId);
+            saveExpenses();
+            renderExpenses();
+            showNotification('Expense deleted', 'success');
+        }
+    }
+    
+    // Get expenses by date range
+    function getExpensesByDateRange(startDate, endDate) {
+        return expenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            return expenseDate >= startDate && expenseDate <= endDate;
+        });
+    }
+    
+    // Get total spent by date range
+    function getTotalSpentByDateRange(startDate, endDate) {
+        const filteredExpenses = getExpensesByDateRange(startDate, endDate);
+        return filteredExpenses.reduce((total, expense) => total + expense.amount, 0);
+    }
+    
+    // Get daily spending
+    function getDailySpending(date) {
+        const dateStr = typeof date === 'string' ? date : date.toISOString().split('T')[0];
+        const dailyExpenses = expenses.filter(expense => expense.date === dateStr);
+        
+        return {
+            date: dateStr,
+            total: dailyExpenses.reduce((sum, exp) => sum + exp.amount, 0),
+            expenses: dailyExpenses,
+            byCategory: dailyExpenses.reduce((cats, exp) => {
+                cats[exp.category] = (cats[exp.category] || 0) + exp.amount;
+                return cats;
+            }, {})
+        };
+    }
+    
+    // Get daily products (expenses by day)
+    function getDailyProducts() {
+        const dailyProducts = {};
+        
+        expenses.forEach(expense => {
+            const date = expense.date;
+            if (!dailyProducts[date]) {
+                dailyProducts[date] = {
+                    total: 0,
+                    items: []
+                };
+            }
+            dailyProducts[date].total += expense.amount;
+            dailyProducts[date].items.push({
+                category: expense.category,
+                description: expense.description || 'No description',
+                amount: expense.amount,
+                time: expense.time || 'N/A'
+            });
+        });
+        
+        return dailyProducts;
+    }
+    
+    // Get spending summary for a period
+    function getSpendingSummary(startDate, endDate) {
+        const periodExpenses = getExpensesByDateRange(startDate, endDate);
+        const totalSpent = periodExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+        
+        // Group by category
+        const byCategory = periodExpenses.reduce((cats, exp) => {
+            cats[exp.category] = (cats[exp.category] || 0) + exp.amount;
+            return cats;
+        }, {});
+        
+        // Group by day
+        const byDay = periodExpenses.reduce((days, exp) => {
+            if (!days[exp.date]) {
+                days[exp.date] = {
+                    total: 0,
+                    count: 0
+                };
+            }
+            days[exp.date].total += exp.amount;
+            days[exp.date].count += 1;
+            return days;
+        }, {});
+        
+        return {
+            totalSpent,
+            averageDaily: totalSpent / Object.keys(byDay).length || 0,
+            byCategory,
+            byDay,
+            expenseCount: periodExpenses.length,
+            periodStart: startDate,
+            periodEnd: endDate
+        };
+    }
+    
+    // Get top spending categories
+    function getTopCategories(limit = 3) {
+        const categoryTotals = {};
+        
+        expenses.forEach(expense => {
+            categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+        });
+        
+        // Convert to array and sort
+        const sortedCategories = Object.entries(categoryTotals)
+            .map(([category, amount]) => ({
+                category,
+                amount,
+                percentage: (amount / getTotalSpent()) * 100
+            }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, limit);
+        
+        return sortedCategories;
+    }
+    
+    // Get recurring expenses (same category, similar amount)
+    function getRecurringExpenses() {
+        const recurring = {};
+        
+        // Group by category and description
+        expenses.forEach(expense => {
+            const key = `${expense.category}-${expense.description}`;
+            if (!recurring[key]) {
+                recurring[key] = {
+                    category: expense.category,
+                    description: expense.description,
+                    count: 0,
+                    total: 0,
+                    average: 0,
+                    dates: []
+                };
+            }
+            
+            recurring[key].count += 1;
+            recurring[key].total += expense.amount;
+            recurring[key].average = recurring[key].total / recurring[key].count;
+            recurring[key].dates.push(expense.date);
+        });
+        
+        // Filter for expenses that appear multiple times
+        const filteredRecurring = Object.values(recurring).filter(item => item.count > 1);
+        
+        return filteredRecurring.sort((a, b) => b.count - a.count);
+    }
+    
+    // Export expenses to CSV
+    function exportToCSV() {
+        if (expenses.length === 0) {
+            alert('No expenses to export');
+            return;
+        }
+        
+        // Create CSV content
+        let csvContent = "Date,Category,Description,Amount\n";
+        
+        expenses.forEach(expense => {
+            const date = new Date(expense.date).toLocaleDateString('en-US');
+            const category = getCategoryInfo(expense.category).name;
+            const description = expense.description ? `"${expense.description}"` : '';
+            const amount = expense.amount.toFixed(2);
+            
+            csvContent += `${date},${category},${description},${amount}\n`;
+        });
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `expenses_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('Expenses exported to CSV!', 'success');
+    }
+    
+    // Clear all expenses
+    function clearAllExpenses() {
+        if (confirm('Are you sure you want to delete ALL expenses? This cannot be undone.')) {
+            expenses = [];
+            saveExpenses();
+            renderExpenses();
+            showNotification('All expenses cleared', 'success');
+        }
     }
     
     // Show notification
@@ -269,9 +507,21 @@ const ExpenseModule = (function() {
     return {
         init,
         loadExpenses,
+        saveExpenses,
         getAllExpenses,
         getExpensesByCategory,
         getTotalSpent,
-        getExpensesByMonth
+        getExpensesByMonth,
+        editExpense,
+        deleteExpense,
+        getExpensesByDateRange,
+        getTotalSpentByDateRange,
+        getDailySpending,
+        getDailyProducts,
+        getSpendingSummary,
+        getTopCategories,
+        getRecurringExpenses,
+        exportToCSV,
+        clearAllExpenses
     };
 })();

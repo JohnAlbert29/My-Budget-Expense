@@ -33,16 +33,23 @@
                 <div class="panel-header">
                     <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
                     <div class="current-month">December 2025</div>
+                    <button class="btn-secondary" id="dailySpendingBtn">
+                        <i class="fas fa-calendar-day"></i> Daily Spending
+                    </button>
                 </div>
                 
                 <div class="budget-summary">
-                    <div class="summary-card">
+                    <div class="summary-card" id="budgetConfigCard">
                         <div class="summary-icon">
                             <i class="fas fa-coins"></i>
                         </div>
                         <div class="summary-info">
                             <h3>Monthly Budget</h3>
                             <div class="amount">₱<span id="monthlyBudget">1500</span></div>
+                            <div class="budget-info">
+                                <small id="budgetDescription">December 2025 Budget</small>
+                                <small id="budgetPeriod">Dec 5 - Jan 4</small>
+                            </div>
                         </div>
                     </div>
                     
@@ -53,6 +60,9 @@
                         <div class="summary-info">
                             <h3>Spent This Month</h3>
                             <div class="amount">₱<span id="totalSpent">0</span></div>
+                            <div class="budget-info">
+                                <small id="dailySpendingAvg">Daily: ₱0</small>
+                            </div>
                         </div>
                     </div>
                     
@@ -63,6 +73,10 @@
                         <div class="summary-info">
                             <h3>Remaining</h3>
                             <div class="amount">₱<span id="remainingBudget">1500</span></div>
+                            <div class="budget-info">
+                                <small id="daysLeft">30 days left</small>
+                                <small id="dailyBudget">₱50/day</small>
+                            </div>
                         </div>
                     </div>
                     
@@ -73,7 +87,17 @@
                         <div class="summary-info">
                             <h3>LRT Discount Savings</h3>
                             <div class="amount">₱<span id="discountSavings">0</span></div>
+                            <div class="budget-info">
+                                <small>Total saved with 50% discount</small>
+                            </div>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="daily-progress-section">
+                    <h3><i class="fas fa-chart-line"></i> Daily Progress</h3>
+                    <div class="daily-bars" id="dailyProgressBars">
+                        <!-- Daily progress bars will be populated here -->
                     </div>
                 </div>
                 
@@ -283,48 +307,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- Add Expense Modal -->
-            <div class="modal" id="expenseModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-plus-circle"></i> Add New Expense</h3>
-                        <button class="close-btn" id="closeExpenseModal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="expenseForm">
-                            <div class="form-group">
-                                <label for="newExpenseCategory">Category:</label>
-                                <select id="newExpenseCategory" required>
-                                    <option value="">Select Category</option>
-                                    <option value="transport">Transportation</option>
-                                    <option value="food">Food</option>
-                                    <option value="coffee">Coffee</option>
-                                    <option value="groceries">Groceries</option>
-                                    <option value="entertainment">Entertainment</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="expenseAmount">Amount (₱):</label>
-                                <input type="number" id="expenseAmount" min="1" step="1" placeholder="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="expenseDescription">Description:</label>
-                                <input type="text" id="expenseDescription" placeholder="What was this expense for?">
-                            </div>
-                            <div class="form-group">
-                                <label for="expenseDateInput">Date:</label>
-                                <input type="date" id="expenseDateInput" value="2025-12-05" min="2025-12-01" max="2025-12-31" required>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
-                                <button type="submit" class="btn-primary">Save Expense</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </main>
 
         <!-- Bottom Navigation -->
@@ -353,6 +335,155 @@
         </button>
     </div>
 
+    <!-- Add Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Add New Expense</h3>
+                <button class="close-btn" id="closeExpenseModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="newExpenseCategory">Category:</label>
+                        <select id="newExpenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="transport">Transportation</option>
+                            <option value="food">Food</option>
+                            <option value="coffee">Coffee</option>
+                            <option value="groceries">Groceries</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount (₱):</label>
+                        <input type="number" id="expenseAmount" min="1" step="1" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description:</label>
+                        <input type="text" id="expenseDescription" placeholder="What was this expense for?">
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDateInput">Date:</label>
+                        <input type="date" id="expenseDateInput" value="2025-12-05" min="2025-12-01" max="2025-12-31" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Configuration Modal -->
+    <div class="modal" id="budgetConfigModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Configure Monthly Budget</h3>
+                <button class="close-btn" id="closeBudgetConfigModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="budgetConfigForm">
+                    <div class="form-group">
+                        <label for="budgetDescription">Budget Name:</label>
+                        <input type="text" id="budgetDescription" placeholder="e.g., December 2025 Budget" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetAmount">Budget Amount (₱):</label>
+                        <input type="number" id="budgetAmount" min="1" step="1" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetDuration">Budget Duration:</label>
+                        <select id="budgetDuration" required>
+                            <option value="">Select Duration</option>
+                            <option value="7">1 Week</option>
+                            <option value="14">2 Weeks</option>
+                            <option value="30" selected>1 Month</option>
+                            <option value="60">2 Months</option>
+                            <option value="90">3 Months</option>
+                            <option value="custom">Custom Days</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customDaysGroup" style="display: none;">
+                        <label for="customDays">Number of Days:</label>
+                        <input type="number" id="customDays" min="1" max="365" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetStartDate">Start Date:</label>
+                        <input type="date" id="budgetStartDate" value="2025-12-05" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetEndDate">End Date (auto-calculated):</label>
+                        <input type="date" id="budgetEndDate" readonly>
+                    </div>
+                    <div class="budget-info">
+                        <div class="info-item">
+                            <span>Daily Budget:</span>
+                            <strong id="dailyBudgetCalc">₱0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Weekly Budget:</span>
+                            <strong id="weeklyBudgetCalc">₱0</strong>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelBudgetConfigBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Budget</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Spending Modal -->
+    <div class="modal" id="dailySpendingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-day"></i> Daily Spending</h3>
+                <button class="close-btn" id="closeDailyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="daily-stats">
+                    <div class="date-selector">
+                        <label for="dailyDate">Select Date:</label>
+                        <input type="date" id="dailyDate" value="2025-12-05">
+                    </div>
+                    <div class="daily-total" id="dailyTotalDisplay">
+                        <!-- Daily total will be shown here -->
+                    </div>
+                    <div class="daily-breakdown" id="dailyBreakdown">
+                        <!-- Breakdown by category -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Term Report Modal -->
+    <div class="modal" id="endTermReportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-invoice"></i> End of Term Report</h3>
+                <button class="close-btn" id="closeEndTermModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="endTermReportContent">
+                    <!-- Report content will be generated here -->
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary" id="printReportBtn">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                    <button class="btn-secondary" id="exportReportBtn">
+                        <i class="fas fa-download"></i> Export as PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="modules/expenseModule.js"></script>
@@ -367,6 +498,13 @@
         if (confirm('Reset all data and start fresh for December 5, 2025?')) {
             localStorage.clear();
             localStorage.setItem('monthlyBudget', '1500');
+            localStorage.setItem('budgetConfig', JSON.stringify({
+                description: 'December 2025 Budget',
+                amount: 1500,
+                startDate: '2025-12-05',
+                endDate: '2026-01-04',
+                duration: 30
+            }));
             location.reload();
         }
     }

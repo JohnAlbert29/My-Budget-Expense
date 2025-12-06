@@ -28,7 +28,22 @@ function initializeApp() {
     setInterval(updateCurrentTime, 1000);
     
     // Update dashboard with empty data
-    if (typeof BudgetModule !== 'undefined') BudgetModule.updateDashboard();
+    if (typeof BudgetModule !== 'undefined') {
+        BudgetModule.updateDashboard();
+        
+        // Setup expense update listener
+        if (typeof ExpenseModule !== 'undefined') {
+            // Override the saveExpenses function to trigger dashboard updates
+            const originalSaveExpenses = ExpenseModule.saveExpenses;
+            ExpenseModule.saveExpenses = function() {
+                originalSaveExpenses.call(this);
+                BudgetModule.onExpensesUpdated();
+            };
+        }
+    }
+    
+    // Update fare table
+    updateFareTable();
     
     console.log('Budget Tracker App Initialized! Starting fresh for December 5, 2025.');
 }
@@ -70,7 +85,7 @@ function updateCurrentTime() {
     if (currentDateElement) currentDateElement.textContent = dateString;
 }
 
-// Add this to your app.js or at the bottom of HTML
+// Update fare table
 function updateFareTable() {
     // Calculate Baclaran to Roosevelt (19 stations)
     const stations1 = 19;
@@ -98,5 +113,19 @@ function updateFareTable() {
     document.getElementById('discountedFare3').textContent = discountedFare3.toFixed(2);
 }
 
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', updateFareTable);
+// Add this to your app.js
+function showDailySpending() {
+    BudgetModule.showDailySpending();
+}
+
+// Add event listener for daily spending
+document.addEventListener('DOMContentLoaded', function() {
+    // Add daily spending button event listener
+    const dailySpendingBtn = document.getElementById('dailySpendingBtn');
+    if (dailySpendingBtn) {
+        dailySpendingBtn.addEventListener('click', showDailySpending);
+    }
+    
+    // Initialize fare table
+    updateFareTable();
+});
