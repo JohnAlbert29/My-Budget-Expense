@@ -88,14 +88,14 @@
                             <h3>LRT Discount Savings</h3>
                             <div class="amount">₱<span id="discountSavings">0</span></div>
                             <div class="budget-info">
-                                <small>Total saved with 50% discount</small>
+                                <small>Total saved with discount</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="daily-progress-section">
-                    <h3><i class="fas fa-chart-line"></i> Daily Progress</h3>
+                    <h3><i class="fas fa-chart-line"></i> Daily Progress (Last 7 Days)</h3>
                     <div class="daily-bars" id="dailyProgressBars">
                         <!-- Daily progress bars will be populated here -->
                     </div>
@@ -138,6 +138,11 @@
                         <label for="expenseDate">Date:</label>
                         <input type="date" id="expenseDate" value="2025-12-05" min="2025-12-01" max="2025-12-31">
                     </div>
+                    <div class="filter-group">
+                        <button class="btn-secondary" id="exportExpensesBtn">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="expense-list" id="expenseList">
@@ -154,26 +159,43 @@
             <section class="panel transport-panel" id="transportPanel">
                 <div class="panel-header">
                     <h2><i class="fas fa-train"></i> LRT 1 Tracker</h2>
-                    <button class="btn-add" id="addTransportBtn">
-                        <i class="fas fa-plus"></i> Add Trip
-                    </button>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addTransportBtn">
+                            <i class="fas fa-plus"></i> Add Trip
+                        </button>
+                        <button class="btn-secondary" id="editTripBtn">
+                            <i class="fas fa-edit"></i> Edit Selected
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="transport-info">
                     <div class="info-card">
-                        <h3><i class="fas fa-ticket-alt"></i> LRT 1 Fare (with 50% discount)</h3>
+                        <h3><i class="fas fa-ticket-alt"></i> LRT 1 Fare Calculator</h3>
                         <div class="fare-table">
-                                <div class="fare-row">
-                                    <span>Baclaran to Roosevelt (19 stations)</span>
-                                    <span>₱<span id="fullFare1">44.18</span> <small class="original-fare">(was ₱<span id="discountedFare1">22.09</span>)</small></span>
-                                </div>
-                                <div class="fare-row">
-                                     <span>Average trip (5 stations)</span>
-                                    <span>₱<span id="fullFare2">23.60</span> <small class="original-fare">(was ₱<span id="discountedFare2">11.80</span>)</small></span>
-                                </div>
                             <div class="fare-row">
-                                <span>Short trip (3 stations)</span>
-                                <span>₱<span id="fullFare3">20.66</span> <small class="original-fare">(was ₱<span id="discountedFare3">10.33</span>)</small></span>
+                                <span>5th Avenue to Gil Puyat (3 stations)</span>
+                                <span>₱<span id="fullFare1">32.00</span> <small class="original-fare">(₱<span id="discountedFare1">16.00</span> <span class="discount-info">with 50% discount</span>)</small></span>
+                            </div>
+                            <div class="fare-row">
+                                <span>Average trip (5 stations)</span>
+                                <span>₱<span id="fullFare2">36.00</span> <small class="original-fare">(₱<span id="discountedFare2">18.00</span> <span class="discount-info">with 50% discount</span>)</small></span>
+                            </div>
+                            <div class="fare-row">
+                                <span>Baclaran to Roosevelt (19 stations)</span>
+                                <span>₱<span id="fullFare3">64.00</span> <small class="original-fare">(₱<span id="discountedFare3">32.00</span> <span class="discount-info">with 50% discount</span>)</small></span>
+                            </div>
+                        </div>
+                        <div class="discount-controls">
+                            <div class="discount-toggle">
+                                <label>
+                                    <input type="checkbox" id="discountToggle" checked> Apply Discount
+                                </label>
+                            </div>
+                            <div class="discount-input">
+                                <input type="number" id="discountPercentage" min="0" max="100" value="50">
+                                <span>%</span>
+                                <button class="btn-small" id="applyDiscountBtn">Apply</button>
                             </div>
                         </div>
                     </div>
@@ -182,8 +204,13 @@
                         <h3><i class="fas fa-calculator"></i> Trip Calculator</h3>
                         <div class="calculator-form">
                             <div class="form-group">
+                                <label for="tripDate">Trip Date:</label>
+                                <input type="date" id="tripDate" value="2025-12-05" min="2025-12-01" max="2025-12-31">
+                            </div>
+                            <div class="form-group">
                                 <label for="stationFrom">From Station:</label>
                                 <select id="stationFrom">
+                                    <option value="5th Avenue">5th Avenue</option>
                                     <option value="Baclaran">Baclaran</option>
                                     <option value="EDSA">EDSA</option>
                                     <option value="Libertad">Libertad</option>
@@ -200,7 +227,6 @@
                                     <option value="Blumentritt">Blumentritt</option>
                                     <option value="Abad Santos">Abad Santos</option>
                                     <option value="R. Papa">R. Papa</option>
-                                    <option value="5th Avenue">5th Avenue</option>
                                     <option value="Monumento">Monumento</option>
                                     <option value="Balintawak">Balintawak</option>
                                     <option value="Roosevelt">Roosevelt</option>
@@ -209,10 +235,11 @@
                             <div class="form-group">
                                 <label for="stationTo">To Station:</label>
                                 <select id="stationTo">
+                                    <option value="Gil Puyat">Gil Puyat</option>
+                                    <option value="5th Avenue">5th Avenue</option>
                                     <option value="Roosevelt">Roosevelt</option>
                                     <option value="Balintawak">Balintawak</option>
                                     <option value="Monumento">Monumento</option>
-                                    <option value="5th Avenue">5th Avenue</option>
                                     <option value="R. Papa">R. Papa</option>
                                     <option value="Abad Santos">Abad Santos</option>
                                     <option value="Blumentritt">Blumentritt</option>
@@ -225,19 +252,18 @@
                                     <option value="Pedro Gil">Pedro Gil</option>
                                     <option value="Quirino">Quirino</option>
                                     <option value="Vito Cruz">Vito Cruz</option>
-                                    <option value="Gil Puyat">Gil Puyat</option>
                                     <option value="Libertad">Libertad</option>
                                     <option value="EDSA">EDSA</option>
                                     <option value="Baclaran">Baclaran</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="tripCount">Number of trips (round trip = 2):</label>
-                                <input type="number" id="tripCount" min="1" value="2">
+                                <label for="tripCount">Number of trips:</label>
+                                <input type="number" id="tripCount" min="1" max="20" value="2">
                             </div>
                             <div class="calculator-result">
-                                <h4>Trip Cost: <span id="tripCost">₱0</span></h4>
-                                <p class="savings-info">You save: <span id="tripSavings">₱0</span> with 50% discount</p>
+                                <h4>Trip Cost: <span id="tripCost">₱32.00</span></h4>
+                                <p class="savings-info">You save: <span id="tripSavings">₱32.00</span> with <span id="currentDiscount">50</span>% discount</p>
                             </div>
                             <button class="btn-primary" id="saveTripBtn">Save Trip to Log</button>
                         </div>
@@ -245,7 +271,21 @@
                 </div>
                 
                 <div class="transport-log">
-                    <h3><i class="fas fa-history"></i> Recent Trips</h3>
+                    <div class="log-header">
+                        <h3><i class="fas fa-history"></i> Recent Trips</h3>
+                        <div class="log-actions">
+                            <button class="btn-secondary" id="exportTripsBtn">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn-secondary" id="clearTripsBtn">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="date-filter">
+                        <label for="tripDateFilter">Filter by Date:</label>
+                        <input type="date" id="tripDateFilter" value="">
+                    </div>
                     <div class="log-list" id="transportLog">
                         <!-- Transport logs will be populated here -->
                     </div>
@@ -307,6 +347,71 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Quarterly Budget Panel -->
+            <section class="panel budget-panel" id="budgetPanel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Quarterly Budgets</h2>
+                    <button class="btn-add" id="createQuarterlyBudgetBtn">
+                        <i class="fas fa-plus"></i> Create Budget
+                    </button>
+                </div>
+                
+                <!-- Quarter Selector -->
+                <div class="quarter-selector">
+                    <h3><i class="fas fa-search"></i> View Quarter Data</h3>
+                    <div class="quarter-filters">
+                        <div class="filter-group">
+                            <label for="quarterSelect">Quarter:</label>
+                            <select id="quarterSelect">
+                                <option value="">Select Quarter</option>
+                                <option value="Q4-2025">Q4 2025 (Oct-Dec)</option>
+                                <option value="Q1-2026">Q1 2026 (Jan-Mar)</option>
+                                <option value="Q2-2026">Q2 2026 (Apr-Jun)</option>
+                                <option value="Q3-2026">Q3 2026 (Jul-Sep)</option>
+                                <option value="Q4-2026">Q4 2026 (Oct-Dec)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="yearSelect">Year:</label>
+                            <select id="yearSelect">
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" id="loadQuarterDataBtn">
+                            <i class="fas fa-chart-bar"></i> Load Data
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quarter Summary -->
+                <div class="quarter-summary" id="quarterSummary">
+                    <!-- Quarter data will be loaded here -->
+                </div>
+                
+                <!-- Quarter Details -->
+                <div class="quarter-details" id="quarterDetails">
+                    <!-- Detailed quarter data -->
+                </div>
+                
+                <!-- Print/Export Section -->
+                <div class="report-actions">
+                    <h3><i class="fas fa-file-pdf"></i> Generate Reports</h3>
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="printQuarterReportBtn">
+                            <i class="fas fa-print"></i> Print Quarter Report
+                        </button>
+                        <button class="btn-secondary" id="exportQuarterCSVBtn">
+                            <i class="fas fa-file-csv"></i> Export as CSV
+                        </button>
+                        <button class="btn-secondary" id="exportQuarterPDFBtn">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </button>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- Bottom Navigation -->
@@ -326,6 +431,10 @@
             <button class="nav-btn" data-panel="timePanel">
                 <i class="fas fa-clock"></i>
                 <span>Time Log</span>
+            </button>
+            <button class="nav-btn" data-panel="budgetPanel">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Quarterly</span>
             </button>
         </nav>
 
@@ -448,7 +557,7 @@
                 <div class="daily-stats">
                     <div class="date-selector">
                         <label for="dailyDate">Select Date:</label>
-                        <input type="date" id="dailyDate" value="2025-12-05">
+                        <input type="date" id="dailyDate" value="2025-12-05" min="2025-12-01" max="2025-12-31">
                     </div>
                     <div class="daily-total" id="dailyTotalDisplay">
                         <!-- Daily total will be shown here -->
@@ -484,12 +593,75 @@
         </div>
     </div>
 
+    <!-- Create Quarterly Budget Modal -->
+    <div class="modal" id="quarterlyBudgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Create Quarterly Budget</h3>
+                <button class="close-btn" id="closeQuarterlyBudgetModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="quarterlyBudgetForm">
+                    <div class="form-group">
+                        <label for="quarterlyBudgetName">Budget Name:</label>
+                        <input type="text" id="quarterlyBudgetName" placeholder="e.g., Q4 2025 Budget" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterlyBudgetQuarter">Quarter:</label>
+                        <select id="quarterlyBudgetQuarter" required>
+                            <option value="">Select Quarter</option>
+                            <option value="Q1">Q1 (January - March)</option>
+                            <option value="Q2">Q2 (April - June)</option>
+                            <option value="Q3">Q3 (July - September)</option>
+                            <option value="Q4" selected>Q4 (October - December)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterlyBudgetYear">Year:</label>
+                        <input type="number" id="quarterlyBudgetYear" min="2025" max="2030" value="2025" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterlyBudgetAmount">Budget Amount (₱):</label>
+                        <input type="number" id="quarterlyBudgetAmount" min="1" step="1" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterlyBudgetStartDate">Start Date:</label>
+                        <input type="date" id="quarterlyBudgetStartDate" value="2025-10-01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterlyBudgetEndDate">End Date:</label>
+                        <input type="date" id="quarterlyBudgetEndDate" value="2025-12-31" required>
+                    </div>
+                    <div class="quarterly-budget-info">
+                        <div class="info-item">
+                            <span>Monthly Budget:</span>
+                            <strong id="monthlyBudgetCalc">₱0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Weekly Budget:</span>
+                            <strong id="weeklyBudgetCalcQ">₱0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Daily Budget:</span>
+                            <strong id="dailyBudgetCalcQ">₱0</strong>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelQuarterlyBudgetBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Create Budget</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="modules/expenseModule.js"></script>
     <script src="modules/transportModule.js"></script>
     <script src="modules/timeLogModule.js"></script>
     <script src="modules/budgetModule.js"></script>
+    <script src="modules/quarterlyBudgetModule.js"></script>
     <script src="modules/uiModule.js"></script>
     <script src="app.js"></script>
     
