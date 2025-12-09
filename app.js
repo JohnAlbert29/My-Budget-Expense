@@ -10,175 +10,29 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     console.log('Budget Tracker App Initializing...');
     
-    // Set current month to December 2025
+    // Set current month display
     updateCurrentMonthDisplay();
     
-    // Initialize modules
-    if (typeof ExpenseModule !== 'undefined') ExpenseModule.init();
-    if (typeof TransportModule !== 'undefined') TransportModule.init();
-    if (typeof TimeLogModule !== 'undefined') TimeLogModule.init();
-    if (typeof BudgetModule !== 'undefined') BudgetModule.init();
-    if (typeof UIModule !== 'undefined') UIModule.init();
-    
-    // Set current date in date inputs to December 5, 2025
-    setDecember5Dates();
-    
-    // Update current time display
-    updateCurrentTime();
-    setInterval(updateCurrentTime, 1000);
-    
-    // Update dashboard with empty data
-    if (typeof BudgetModule !== 'undefined') {
-        BudgetModule.updateDashboard();
-        
-        // Setup expense update listener
-        if (typeof ExpenseModule !== 'undefined') {
-            // Override the saveExpenses function to trigger dashboard updates
-            const originalSaveExpenses = ExpenseModule.saveExpenses;
-            ExpenseModule.saveExpenses = function() {
-                originalSaveExpenses.call(this);
-                BudgetModule.onExpensesUpdated();
-            };
-        }
+    // Initialize theme first
+    if (typeof UIModule !== 'undefined') {
+        UIModule.init();
     }
     
-    // Update fare table
-    updateFareTable();
-    
-    console.log('Budget Tracker App Initialized! Starting fresh for December 5, 2025.');
-}
-
-function updateCurrentMonthDisplay() {
-    const currentMonthElement = document.querySelector('.current-month');
-    if (currentMonthElement) {
-        currentMonthElement.textContent = 'December 2025';
-    }
-}
-
-function setDecember5Dates() {
-    // Set all dates to December 5, 2025
-    const december5 = '2025-12-05';
-    const decemberStart = '2025-12-01';
-    const decemberEnd = '2025-12-31';
-    
-    // Get all date inputs and set to December 5, 2025
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    dateInputs.forEach(input => {
-        input.value = december5;
-        input.min = decemberStart;
-        input.max = decemberEnd;
-    });
-}
-
-function updateCurrentTime() {
-    // Use actual current time
-    const now = new Date();
-    const timeString = now.toLocaleTimeString();
-    
-    // But use December 5, 2025 for the date display
-    const dateString = 'Friday, December 5, 2025';
-    
-    const currentTimeElement = document.getElementById('currentTime');
-    const currentDateElement = document.getElementById('currentDate');
-    
-    if (currentTimeElement) currentTimeElement.textContent = timeString;
-    if (currentDateElement) currentDateElement.textContent = dateString;
-}
-
-// Update fare table
-function updateFareTable() {
-    // Calculate Baclaran to Roosevelt (19 stations)
-    const stations1 = 19;
-    const fare1 = 16.25 + (stations1 * 1.47);
-    const discountedFare1 = fare1 * 0.5;
-    
-    // Calculate average trip (5 stations)
-    const stations2 = 5;
-    const fare2 = 16.25 + (stations2 * 1.47);
-    const discountedFare2 = fare2 * 0.5;
-    
-    // Calculate short trip (3 stations)
-    const stations3 = 3;
-    const fare3 = 16.25 + (stations3 * 1.47);
-    const discountedFare3 = fare3 * 0.5;
-    
-    // Update the display
-    document.getElementById('fullFare1').textContent = fare1.toFixed(2);
-    document.getElementById('discountedFare1').textContent = discountedFare1.toFixed(2);
-    
-    document.getElementById('fullFare2').textContent = fare2.toFixed(2);
-    document.getElementById('discountedFare2').textContent = discountedFare2.toFixed(2);
-    
-    document.getElementById('fullFare3').textContent = fare3.toFixed(2);
-    document.getElementById('discountedFare3').textContent = discountedFare3.toFixed(2);
-}
-
-// Add this to your app.js
-function showDailySpending() {
-    BudgetModule.showDailySpending();
-}
-
-// In app.js, add to initializeApp function:
-function initializeApp() {
-    console.log('Budget Tracker App Initializing...');
-    
-    // Set current month to December 2025
-    updateCurrentMonthDisplay();
-    
-    // Initialize modules
-    if (typeof ExpenseModule !== 'undefined') ExpenseModule.init();
-    if (typeof TransportModule !== 'undefined') TransportModule.init();
-    if (typeof TimeLogModule !== 'undefined') TimeLogModule.init();
-    if (typeof BudgetModule !== 'undefined') BudgetModule.init();
-    if (typeof UIModule !== 'undefined') UIModule.init();
-    
-    // Set current date in date inputs to December 5, 2025
-    setDecember5Dates();
-    
-    // Update current time display
-    updateCurrentTime();
-    setInterval(updateCurrentTime, 1000);
-    
-    // Update dashboard with empty data
-    if (typeof BudgetModule !== 'undefined') {
-        BudgetModule.updateDashboard();
-        
-        // Setup expense update listener
-        if (typeof ExpenseModule !== 'undefined') {
-            // Override the saveExpenses function to trigger dashboard updates
-            const originalSaveExpenses = ExpenseModule.saveExpenses;
-            ExpenseModule.saveExpenses = function() {
-                originalSaveExpenses.call(this);
-                BudgetModule.onExpensesUpdated();
-            };
-        }
-    }
-    
-    console.log('Budget Tracker App Initialized! Starting fresh for December 5, 2025.');
-}
-
-// app.js - Updated with new module initialization
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
-
-function initializeApp() {
-    console.log('Budget Tracker App Initializing...');
-    
-    updateCurrentMonthDisplay();
-    
-    // Initialize all modules
+    // Initialize other modules
     if (typeof ExpenseModule !== 'undefined') ExpenseModule.init();
     if (typeof TransportModule !== 'undefined') TransportModule.init();
     if (typeof TimeLogModule !== 'undefined') TimeLogModule.init();
     if (typeof BudgetModule !== 'undefined') BudgetModule.init();
     if (typeof QuarterlyBudgetModule !== 'undefined') QuarterlyBudgetModule.init();
-    if (typeof UIModule !== 'undefined') UIModule.init();
     
-    setDecember5Dates();
+    // Set date inputs to current date
+    setCurrentDates();
+    
+    // Update current time display
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
     
+    // Update dashboard with empty data
     if (typeof BudgetModule !== 'undefined') {
         BudgetModule.updateDashboard();
         
@@ -190,6 +44,27 @@ function initializeApp() {
                 BudgetModule.onExpensesUpdated();
             };
         }
+    }
+    
+    // Setup daily spending button
+    const dailySpendingBtn = document.getElementById('dailySpendingBtn');
+    if (dailySpendingBtn) {
+        dailySpendingBtn.addEventListener('click', showDailySpending);
+    }
+    
+    // Setup budget config card click
+    const budgetConfigCard = document.getElementById('budgetConfigCard');
+    if (budgetConfigCard) {
+        budgetConfigCard.addEventListener('click', function() {
+            if (typeof BudgetModule !== 'undefined') {
+                BudgetModule.openBudgetConfigModal();
+            }
+        });
+    }
+    
+    // Initialize fare table
+    if (typeof TransportModule !== 'undefined') {
+        TransportModule.updateFareTable();
     }
     
     console.log('Budget Tracker App Initialized!');
@@ -198,35 +73,70 @@ function initializeApp() {
 function updateCurrentMonthDisplay() {
     const currentMonthElement = document.querySelector('.current-month');
     if (currentMonthElement) {
-        currentMonthElement.textContent = 'December 2025';
+        const now = new Date();
+        currentMonthElement.textContent = now.toLocaleDateString('en-US', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
     }
 }
 
-function setDecember5Dates() {
-    const december5 = '2025-12-05';
-    const decemberStart = '2025-12-01';
-    const decemberEnd = '2025-12-31';
+function setCurrentDates() {
+    const today = new Date().toISOString().split('T')[0];
+    const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    const lastOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
     
+    // Get all date inputs and set to current date
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
-        input.value = december5;
-        input.min = decemberStart;
-        input.max = decemberEnd;
+        // Don't override if it already has a value (like in modals)
+        if (!input.value) {
+            input.value = today;
+        }
+        input.min = firstOfMonth;
+        input.max = lastOfMonth;
     });
     
-    // Set trip date filter to empty by default
+    // Set specific date inputs
     const tripDateFilter = document.getElementById('tripDateFilter');
     if (tripDateFilter) {
         tripDateFilter.value = '';
-        tripDateFilter.min = decemberStart;
-        tripDateFilter.max = decemberEnd;
+        tripDateFilter.min = firstOfMonth;
+        tripDateFilter.max = lastOfMonth;
+    }
+    
+    // Set log date to today by default
+    const logDate = document.getElementById('logDate');
+    if (logDate) {
+        logDate.value = today;
+        logDate.min = firstOfMonth;
+        logDate.max = lastOfMonth;
+    }
+    
+    // Set daily date to today
+    const dailyDate = document.getElementById('dailyDate');
+    if (dailyDate) {
+        dailyDate.value = today;
+        dailyDate.min = firstOfMonth;
+        dailyDate.max = lastOfMonth;
+    }
+    
+    // Set budget start date to today if empty
+    const budgetStartDate = document.getElementById('budgetStartDate');
+    if (budgetStartDate && !budgetStartDate.value) {
+        budgetStartDate.value = today;
     }
 }
 
 function updateCurrentTime() {
     const now = new Date();
     const timeString = now.toLocaleTimeString();
-    const dateString = 'Friday, December 5, 2025';
+    const dateString = now.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
     
     const currentTimeElement = document.getElementById('currentTime');
     const currentDateElement = document.getElementById('currentDate');
@@ -254,27 +164,108 @@ function resetToDecember5() {
             endDate: '2026-01-04',
             duration: 30
         }));
+        localStorage.setItem('theme', 'light');
         location.reload();
     }
 }
 
-// Add LRT fare initialization
+// Add event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Set default stations to 5th Avenue and Gil Puyat
+    // Set default stations
     const stationFrom = document.getElementById('stationFrom');
     const stationTo = document.getElementById('stationTo');
     
     if (stationFrom) stationFrom.value = '5th Avenue';
     if (stationTo) stationTo.value = 'Gil Puyat';
+    
+    // Add click handler for expense modal close buttons
+    document.addEventListener('click', function(e) {
+        // Handle modal close buttons
+        if (e.target.classList.contains('close-btn')) {
+            const modal = e.target.closest('.modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+    });
 });
-// Add event listener for daily spending
-document.addEventListener('DOMContentLoaded', function() {
-    // Add daily spending button event listener
-    const dailySpendingBtn = document.getElementById('dailySpendingBtn');
-    if (dailySpendingBtn) {
-        dailySpendingBtn.addEventListener('click', showDailySpending);
+
+// Global function to show notification (used by modules)
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Style the notification
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    `;
+    
+    // Set background color based on type
+    if (type === 'success') {
+        notification.style.backgroundColor = '#4ade80';
+    } else if (type === 'error') {
+        notification.style.backgroundColor = '#ef4444';
+    } else if (type === 'warning') {
+        notification.style.backgroundColor = '#f59e0b';
+    } else {
+        notification.style.backgroundColor = '#4361ee';
     }
     
-    // Initialize fare table
-    updateFareTable();
-});
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(note => note.remove());
+    
+    // Add to DOM
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Utility function to format date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+}
+
+// Utility function to get category info
+function getCategoryInfo(category) {
+    const categories = {
+        transport: { name: 'Transportation', color: '#4361ee', icon: 'fas fa-train' },
+        food: { name: 'Food', color: '#f59e0b', icon: 'fas fa-utensils' },
+        coffee: { name: 'Coffee', color: '#8b4513', icon: 'fas fa-coffee' },
+        groceries: { name: 'Groceries', color: '#4ade80', icon: 'fas fa-shopping-basket' },
+        entertainment: { name: 'Entertainment', color: '#ec4899', icon: 'fas fa-film' },
+        other: { name: 'Other', color: '#64748b', icon: 'fas fa-wallet' }
+    };
+    
+    return categories[category] || categories.other;
+}
+
+// Export function for other modules to use
+window.showNotification = showNotification;
+window.formatDate = formatDate;
+window.getCategoryInfo = getCategoryInfo;

@@ -5,6 +5,7 @@ const UIModule = (function() {
         setupNavigation();
         setupThemeToggle();
         setupSettings();
+        addNotificationStyles();
     }
     
     // Setup navigation between panels
@@ -25,26 +26,44 @@ const UIModule = (function() {
                     panel.classList.remove('active');
                     if (panel.id === panelId) {
                         panel.classList.add('active');
+                        
+                        // Update today's log when switching to time panel
+                        if (panelId === 'timePanel' && typeof TimeLogModule !== 'undefined') {
+                            TimeLogModule.updateTodayLog();
+                        }
                     }
                 });
             });
         });
     }
     
-    // Setup theme toggle
+    // Setup theme toggle - FIXED VERSION
     function setupThemeToggle() {
         const themeBtn = document.getElementById('themeBtn');
         
         if (themeBtn) {
+            // Load saved theme first
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                const icon = themeBtn.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sun';
+                }
+            }
+            
+            // Add click event listener
             themeBtn.addEventListener('click', function() {
                 const isDark = document.body.classList.toggle('dark-theme');
                 
                 // Update icon
                 const icon = this.querySelector('i');
-                if (isDark) {
-                    icon.className = 'fas fa-sun';
-                } else {
-                    icon.className = 'fas fa-moon';
+                if (icon) {
+                    if (isDark) {
+                        icon.className = 'fas fa-sun';
+                    } else {
+                        icon.className = 'fas fa-moon';
+                    }
                 }
                 
                 // Save preference
@@ -52,14 +71,6 @@ const UIModule = (function() {
                 
                 showNotification(`Switched to ${isDark ? 'dark' : 'light'} theme`, 'info');
             });
-            
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-                const icon = themeBtn.querySelector('i');
-                icon.className = 'fas fa-sun';
-            }
         }
     }
     
@@ -69,8 +80,7 @@ const UIModule = (function() {
         
         if (settingsBtn) {
             settingsBtn.addEventListener('click', function() {
-                // In a full app, this would open a settings panel
-                // For now, show a simple dialog with options
+                // Create settings modal
                 const settingsHtml = `
                     <div class="modal active" id="settingsModal">
                         <div class="modal-content">
@@ -83,7 +93,7 @@ const UIModule = (function() {
                                     <h4>Monthly Budget</h4>
                                     <div class="budget-input">
                                         <span>₱</span>
-                                        <input type="number" id="budgetInput" value="${BudgetModule.getMonthlyBudget()}" min="1">
+                                        <input type="number" id="budgetInput" value="${typeof BudgetModule !== 'undefined' ? BudgetModule.getMonthlyBudget() : '1500'}" min="1">
                                     </div>
                                     <button class="btn-primary" id="saveBudgetBtn">Update Budget</button>
                                 </div>
@@ -91,6 +101,15 @@ const UIModule = (function() {
                                     <h4>Data Management</h4>
                                     <button class="btn-secondary" id="exportDataBtn">Export All Data</button>
                                     <button class="btn-secondary" id="resetDataBtn">Reset All Data</button>
+                                </div>
+                                <div class="settings-option">
+                                    <h4>Appearance</h4>
+                                    <div class="theme-toggle">
+                                        <label>
+                                            <input type="checkbox" id="themeToggle" ${localStorage.getItem('theme') === 'dark' ? 'checked' : ''}>
+                                            Dark Mode
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="settings-option">
                                     <h4>About</h4>
@@ -108,30 +127,68 @@ const UIModule = (function() {
                 document.body.appendChild(modalContainer);
                 
                 // Setup event listeners for the modal
-                document.getElementById('closeSettingsModal').addEventListener('click', function() {
-                    document.getElementById('settingsModal').remove();
-                });
-                
-                document.getElementById('saveBudgetBtn').addEventListener('click', function() {
-                    const newBudget = parseFloat(document.getElementById('budgetInput').value);
-                    if (!isNaN(newBudget) && newBudget > 0) {
-                        BudgetModule.setMonthlyBudget(newBudget);
+                const closeBtn = document.getElementById('closeSettingsModal');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
                         document.getElementById('settingsModal').remove();
-                        showNotification('Budget updated successfully!', 'success');
-                    } else {
-                        alert('Please enter a valid budget amount');
-                    }
-                });
+                    });
+                }
                 
-                document.getElementById('exportDataBtn').addEventListener('click', exportAllData);
-                document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
+                const saveBudgetBtn = document.getElementById('saveBudgetBtn');
+                if (saveBudgetBtn) {
+                    saveBudgetBtn.addEventListener('click', function() {
+                        const newBudget = parseFloat(document.getElementById('budgetInput').value);
+                        if (!isNaN(newBudget) && newBudget > 0) {
+                            if (typeof BudgetModule !== 'undefined') {
+                                BudgetModule.setMonthlyBudget(newBudget);
+                            }
+                            document.getElementById('settingsModal').remove();
+                            showNotification('Budget updated successfully!', 'success');
+                        } else {
+                            alert('Please enter a valid budget amount');
+                        }
+                    });
+                }
+                
+                const exportDataBtn = document.getElementById('exportDataBtn');
+                if (exportDataBtn) {
+                    exportDataBtn.addEventListener('click', exportAllData);
+                }
+                
+                const resetDataBtn = document.getElementById('resetDataBtn');
+                if (resetDataBtn) {
+                    resetDataBtn.addEventListener('click', resetAllData);
+                }
+                
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('change', function() {
+                        const isDark = this.checked;
+                        document.body.classList.toggle('dark-theme', isDark);
+                        
+                        // Update theme button icon
+                        const themeBtn = document.getElementById('themeBtn');
+                        if (themeBtn) {
+                            const icon = themeBtn.querySelector('i');
+                            if (icon) {
+                                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                            }
+                        }
+                        
+                        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                        showNotification(`${isDark ? 'Dark' : 'Light'} theme applied`, 'info');
+                    });
+                }
                 
                 // Close when clicking outside
-                document.getElementById('settingsModal').addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.remove();
-                    }
-                });
+                const settingsModal = document.getElementById('settingsModal');
+                if (settingsModal) {
+                    settingsModal.addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            this.remove();
+                        }
+                    });
+                }
             });
         }
     }
@@ -144,6 +201,7 @@ const UIModule = (function() {
             transportLogs: JSON.parse(localStorage.getItem('transportLogs') || '[]'),
             timeLogs: JSON.parse(localStorage.getItem('timeLogs') || '[]'),
             monthlyBudget: localStorage.getItem('monthlyBudget') || '1500',
+            theme: localStorage.getItem('theme') || 'light',
             exportDate: new Date().toISOString()
         };
         
@@ -167,39 +225,88 @@ const UIModule = (function() {
         if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
             localStorage.clear();
             
+            // Set default theme to light
+            localStorage.setItem('theme', 'light');
+            
             // Reload the page to reset everything
             location.reload();
         }
     }
     
+    // Add notification styles to head
+    function addNotificationStyles() {
+        if (!document.getElementById('notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                
+                @keyframes slideOut {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+                
+                .notification {
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 500;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                    max-width: 300px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+                
+                .notification.success {
+                    background-color: #4ade80;
+                }
+                
+                .notification.error {
+                    background-color: #ef4444;
+                }
+                
+                .notification.info {
+                    background-color: #4361ee;
+                }
+                
+                .notification.warning {
+                    background-color: #f59e0b;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
     // Show notification
     function showNotification(message, type) {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
+        
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
-        
-        // Style the notification
-        notification.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        `;
-        
-        // Set background color based on type
-        if (type === 'success') {
-            notification.style.backgroundColor = '#4ade80';
-        } else if (type === 'error') {
-            notification.style.backgroundColor = '#ef4444';
-        } else {
-            notification.style.backgroundColor = '#4361ee';
-        }
         
         // Add to DOM
         document.body.appendChild(notification);
@@ -217,6 +324,8 @@ const UIModule = (function() {
     
     // Public API
     return {
-        init
+        init,
+        showNotification,
+        setupThemeToggle
     };
 })();
