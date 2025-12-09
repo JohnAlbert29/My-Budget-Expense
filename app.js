@@ -23,7 +23,7 @@ function initializeApp() {
     if (typeof TransportModule !== 'undefined') TransportModule.init();
     if (typeof TimeLogModule !== 'undefined') TimeLogModule.init();
     if (typeof BudgetModule !== 'undefined') BudgetModule.init();
-    if (typeof QuarterlyBudgetModule !== 'undefined') QuarterlyBudgetModule.init();
+    if (typeof NamedBudgetModule !== 'undefined') NamedBudgetModule.init(); // Changed from QuarterlyBudgetModule
     
     // Set date inputs to current date
     setCurrentDates();
@@ -67,13 +67,26 @@ function initializeApp() {
         TransportModule.updateFareTable();
     }
     
+    // Setup named budget module listeners if available
+    if (typeof NamedBudgetModule !== 'undefined') {
+        // Listen for expense updates to refresh named budgets if needed
+        const originalSaveExpenses = ExpenseModule.saveExpenses;
+        ExpenseModule.saveExpenses = function() {
+            originalSaveExpenses.call(this);
+            // If a named budget is currently loaded, refresh it
+            if (NamedBudgetModule.currentBudgetData) {
+                NamedBudgetModule.loadBudgetDataById(NamedBudgetModule.currentBudgetData.budget.id);
+            }
+        };
+    }
+    
     console.log('Budget Tracker App Initialized!');
 }
 
 function updateCurrentMonthDisplay() {
     const currentMonthElement = document.querySelector('.current-month');
     if (currentMonthElement) {
-        const now = new Date();
+        const now = new Date('2025-12-05'); // Fixed date for this app
         currentMonthElement.textContent = now.toLocaleDateString('en-US', { 
             month: 'long', 
             year: 'numeric' 
@@ -82,15 +95,20 @@ function updateCurrentMonthDisplay() {
 }
 
 function setCurrentDates() {
-    const today = new Date().toISOString().split('T')[0];
-    const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-    const lastOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
+    const today = new Date('2025-12-05').toISOString().split('T')[0];
+    const firstOfMonth = new Date(2025, 11, 1).toISOString().split('T')[0];
+    const lastOfMonth = new Date(2025, 11, 31).toISOString().split('T')[0];
     
     // Get all date inputs and set to current date
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
         // Don't override if it already has a value (like in modals)
         if (!input.value) {
+            // Check if it's a budget modal date field
+            if (input.id === 'namedBudgetStartDate' || input.id === 'namedBudgetEndDate') {
+                // Leave budget dates as they are (they have defaults)
+                return;
+            }
             input.value = today;
         }
         input.min = firstOfMonth;
@@ -125,6 +143,12 @@ function setCurrentDates() {
     const budgetStartDate = document.getElementById('budgetStartDate');
     if (budgetStartDate && !budgetStartDate.value) {
         budgetStartDate.value = today;
+    }
+    
+    // Set named budget start date to today if empty
+    const namedBudgetStartDate = document.getElementById('namedBudgetStartDate');
+    if (namedBudgetStartDate && !namedBudgetStartDate.value) {
+        namedBudgetStartDate.value = today;
     }
 }
 
@@ -171,14 +195,14 @@ function resetToDecember5() {
 
 // Add event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Set default stations
+    // Set default stations for LRT calculator
     const stationFrom = document.getElementById('stationFrom');
     const stationTo = document.getElementById('stationTo');
     
     if (stationFrom) stationFrom.value = '5th Avenue';
     if (stationTo) stationTo.value = 'Gil Puyat';
     
-    // Add click handler for expense modal close buttons
+    // Add click handler for modal close buttons
     document.addEventListener('click', function(e) {
         // Handle modal close buttons
         if (e.target.classList.contains('close-btn')) {
@@ -188,6 +212,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // Initialize named budget duration calculation
+    const budgetDuration = document.getElementById('budgetDuration');
+    if (budgetDuration) {
+        budgetDuration.addEventListener('change', function() {
+            const customDaysGroup = document.getElementById('customDaysGroup');
+            if (this.value === 'custom') {
+                if (customDaysGroup) customDaysGroup.style.display = 'block';
+            } else {
+                if (customDaysGroup) customDaysGroup.style.display = 'none';
+                if (typeof NamedBudgetModule !== 'undefined') {
+                    NamedBudgetModule.calculateEndDate();
+                    NamedBudgetModule.calculateNamedBudgetBreakdown();
+                }
+            }
+        });
+    }
+    
+    // Initialize budget amount calculation
+    const namedBudgetAmount = document.getElementById('namedBudgetAmount');
+    if (namedBudgetAmount) {
+        namedBudgetAmount.addEventListener('input', function() {
+            if (typeof NamedBudgetModule !== 'undefined') {
+                NamedBudgetModule.calculateNamedBudgetBreakdown();
+            }
+        });
+    }
 });
 
 // Global function to show notification (used by modules)
@@ -265,7 +316,15 @@ function getCategoryInfo(category) {
     return categories[category] || categories.other;
 }
 
+// Utility function to format date range
+function formatDateRange(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+}
+
 // Export function for other modules to use
 window.showNotification = showNotification;
 window.formatDate = formatDate;
 window.getCategoryInfo = getCategoryInfo;
+window.formatDateRange = formatDateRange;

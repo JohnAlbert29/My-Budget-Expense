@@ -348,66 +348,63 @@
                 </div>
             </section>
 
-            <!-- Quarterly Budget Panel -->
+            <!-- NAMED BUDGETS Panel (Replaces Quarterly Budgets) -->
             <section class="panel budget-panel" id="budgetPanel">
                 <div class="panel-header">
-                    <h2><i class="fas fa-calendar-alt"></i> Quarterly Budgets</h2>
-                    <button class="btn-add" id="createQuarterlyBudgetBtn">
+                    <h2><i class="fas fa-calendar-alt"></i> Named Budgets</h2>
+                    <button class="btn-add" id="createNamedBudgetBtn">
                         <i class="fas fa-plus"></i> Create Budget
                     </button>
                 </div>
                 
-                <!-- Quarter Selector -->
+                <!-- Budget Selector -->
                 <div class="quarter-selector">
-                    <h3><i class="fas fa-search"></i> View Quarter Data</h3>
+                    <h3><i class="fas fa-search"></i> View Budget Data</h3>
                     <div class="quarter-filters">
                         <div class="filter-group">
-                            <label for="quarterSelect">Quarter:</label>
-                            <select id="quarterSelect">
-                                <option value="">Select Quarter</option>
-                                <option value="Q4-2025">Q4 2025 (Oct-Dec)</option>
-                                <option value="Q1-2026">Q1 2026 (Jan-Mar)</option>
-                                <option value="Q2-2026">Q2 2026 (Apr-Jun)</option>
-                                <option value="Q3-2026">Q3 2026 (Jul-Sep)</option>
-                                <option value="Q4-2026">Q4 2026 (Oct-Dec)</option>
+                            <label for="budgetSelect">Select Budget:</label>
+                            <select id="budgetSelect">
+                                <option value="">Select a Budget</option>
+                                <!-- Budgets will be populated here -->
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <label for="yearSelect">Year:</label>
-                            <select id="yearSelect">
-                                <option value="2025">2025</option>
-                                <option value="2026">2026</option>
-                                <option value="2027">2027</option>
-                            </select>
-                        </div>
-                        <button class="btn-primary" id="loadQuarterDataBtn">
+                        <button class="btn-primary" id="loadBudgetDataBtn">
                             <i class="fas fa-chart-bar"></i> Load Data
+                        </button>
+                        <button class="btn-secondary" id="viewArchiveBtn">
+                            <i class="fas fa-archive"></i> View Archive
                         </button>
                     </div>
                 </div>
                 
-                <!-- Quarter Summary -->
-                <div class="quarter-summary" id="quarterSummary">
-                    <!-- Quarter data will be loaded here -->
+                <!-- Budget Summary -->
+                <div class="quarter-summary" id="budgetSummary">
+                    <!-- Budget data will be loaded here -->
                 </div>
                 
-                <!-- Quarter Details -->
-                <div class="quarter-details" id="quarterDetails">
-                    <!-- Detailed quarter data -->
+                <!-- Budget Details -->
+                <div class="quarter-details" id="budgetDetails">
+                    <!-- Detailed budget data -->
                 </div>
                 
-                <!-- Print/Export Section -->
+                <!-- Action Buttons -->
                 <div class="report-actions">
-                    <h3><i class="fas fa-file-pdf"></i> Generate Reports</h3>
+                    <h3><i class="fas fa-file-pdf"></i> Budget Actions</h3>
                     <div class="action-buttons">
-                        <button class="btn-primary" id="printQuarterReportBtn">
-                            <i class="fas fa-print"></i> Print Quarter Report
+                        <button class="btn-primary" id="printBudgetReportBtn">
+                            <i class="fas fa-print"></i> Print Report
                         </button>
-                        <button class="btn-secondary" id="exportQuarterCSVBtn">
+                        <button class="btn-secondary" id="exportBudgetCSVBtn">
                             <i class="fas fa-file-csv"></i> Export as CSV
                         </button>
-                        <button class="btn-secondary" id="exportQuarterPDFBtn">
+                        <button class="btn-secondary" id="exportBudgetPDFBtn">
                             <i class="fas fa-file-pdf"></i> Export as PDF
+                        </button>
+                        <button class="btn-danger" id="archiveBudgetBtn">
+                            <i class="fas fa-archive"></i> Archive Budget
+                        </button>
+                        <button class="btn-danger" id="deleteBudgetBtn">
+                            <i class="fas fa-trash"></i> Delete Budget
                         </button>
                     </div>
                 </div>
@@ -434,7 +431,7 @@
             </button>
             <button class="nav-btn" data-panel="budgetPanel">
                 <i class="fas fa-calendar-alt"></i>
-                <span>Quarterly</span>
+                <span>Named Budgets</span>
             </button>
         </nav>
 
@@ -593,61 +590,75 @@
         </div>
     </div>
 
-    <!-- Create Quarterly Budget Modal -->
-    <div class="modal" id="quarterlyBudgetModal">
+    <!-- Create Named Budget Modal -->
+    <div class="modal" id="namedBudgetModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-plus-circle"></i> Create Quarterly Budget</h3>
-                <button class="close-btn" id="closeQuarterlyBudgetModal">&times;</button>
+                <h3><i class="fas fa-plus-circle"></i> Create Named Budget</h3>
+                <button class="close-btn" id="closeNamedBudgetModal">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="quarterlyBudgetForm">
+                <form id="namedBudgetForm">
                     <div class="form-group">
-                        <label for="quarterlyBudgetName">Budget Name:</label>
-                        <input type="text" id="quarterlyBudgetName" placeholder="e.g., Q4 2025 Budget" required>
+                        <label for="namedBudgetName">Budget Name:</label>
+                        <input type="text" id="namedBudgetName" placeholder="e.g., 1st Cut Off Budget" required>
                     </div>
                     <div class="form-group">
-                        <label for="quarterlyBudgetQuarter">Quarter:</label>
-                        <select id="quarterlyBudgetQuarter" required>
-                            <option value="">Select Quarter</option>
-                            <option value="Q1">Q1 (January - March)</option>
-                            <option value="Q2">Q2 (April - June)</option>
-                            <option value="Q3">Q3 (July - September)</option>
-                            <option value="Q4" selected>Q4 (October - December)</option>
+                        <label for="budgetDescription">Description:</label>
+                        <textarea id="budgetDescription" placeholder="What is this budget for?" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetType">Budget Type:</label>
+                        <select id="budgetType" required>
+                            <option value="cutoff">Cut Off</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="project">Project</option>
+                            <option value="custom">Custom</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="quarterlyBudgetYear">Year:</label>
-                        <input type="number" id="quarterlyBudgetYear" min="2025" max="2030" value="2025" required>
+                        <label for="namedBudgetAmount">Budget Amount (₱):</label>
+                        <input type="number" id="namedBudgetAmount" min="1" step="1" placeholder="0" required>
                     </div>
                     <div class="form-group">
-                        <label for="quarterlyBudgetAmount">Budget Amount (₱):</label>
-                        <input type="number" id="quarterlyBudgetAmount" min="1" step="1" placeholder="0" required>
+                        <label for="budgetDuration">Budget Duration:</label>
+                        <select id="budgetDuration" required>
+                            <option value="">Select Duration</option>
+                            <option value="7">1 Week</option>
+                            <option value="14">2 Weeks</option>
+                            <option value="30">1 Month</option>
+                            <option value="custom" selected>Custom Days</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customDaysGroup">
+                        <label for="customDays">Number of Days:</label>
+                        <input type="number" id="customDays" min="1" max="365" value="10">
                     </div>
                     <div class="form-group">
-                        <label for="quarterlyBudgetStartDate">Start Date:</label>
-                        <input type="date" id="quarterlyBudgetStartDate" value="2025-10-01" required>
+                        <label for="namedBudgetStartDate">Start Date:</label>
+                        <input type="date" id="namedBudgetStartDate" value="2025-12-05" required>
                     </div>
                     <div class="form-group">
-                        <label for="quarterlyBudgetEndDate">End Date:</label>
-                        <input type="date" id="quarterlyBudgetEndDate" value="2025-12-31" required>
+                        <label for="namedBudgetEndDate">End Date (auto-calculated):</label>
+                        <input type="date" id="namedBudgetEndDate" value="2025-12-15" required>
                     </div>
                     <div class="quarterly-budget-info">
                         <div class="info-item">
-                            <span>Monthly Budget:</span>
+                            <span>Monthly Estimate:</span>
                             <strong id="monthlyBudgetCalc">₱0</strong>
                         </div>
                         <div class="info-item">
-                            <span>Weekly Budget:</span>
-                            <strong id="weeklyBudgetCalcQ">₱0</strong>
+                            <span>Weekly Estimate:</span>
+                            <strong id="weeklyBudgetCalc">₱0</strong>
                         </div>
                         <div class="info-item">
-                            <span>Daily Budget:</span>
-                            <strong id="dailyBudgetCalcQ">₱0</strong>
+                            <span>Daily Estimate:</span>
+                            <strong id="dailyBudgetCalc">₱0</strong>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="cancelQuarterlyBudgetBtn">Cancel</button>
+                        <button type="button" class="btn-secondary" id="cancelNamedBudgetBtn">Cancel</button>
                         <button type="submit" class="btn-primary">Create Budget</button>
                     </div>
                 </form>
@@ -661,7 +672,7 @@
     <script src="modules/transportModule.js"></script>
     <script src="modules/timeLogModule.js"></script>
     <script src="modules/budgetModule.js"></script>
-    <script src="modules/quarterlyBudgetModule.js"></script>
+    <script src="modules/namedBudgetModule.js"></script>
     <script src="modules/uiModule.js"></script>
     <script src="app.js"></script>
     
@@ -677,6 +688,7 @@
                 endDate: '2026-01-04',
                 duration: 30
             }));
+            localStorage.setItem('theme', 'light');
             location.reload();
         }
     }
